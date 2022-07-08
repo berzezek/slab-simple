@@ -1,17 +1,23 @@
 <template lang="">
   <div>
-    <main-page />
+    <MainHeader />
+    <router-view></router-view>
   </div>
 </template>
 <script>
-import MainPage from './components/page/MainPage.vue'
+import MainPage from '@/views/MainPage.vue'
+import MainHeader from '@/views/MainHeader.vue'
+import 'vue-good-table-next/dist/vue-good-table-next.css'
 export default {
   components: {
-    MainPage
+    MainHeader,
+    MainPage,
   }
   
 }
 </script>
-<style lang="">
-  
+
+<style>
+
 </style>
+
