@@ -2,7 +2,8 @@
     <div class="container">
         <vue-good-table
         :columns="columns"
-        :rows="rows"/>
+        :rows="rows"
+        :fixed-header="true"/>
     </div>
 </template>
 <script>

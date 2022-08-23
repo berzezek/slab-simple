@@ -7,16 +7,18 @@
       <vue-good-table
         :columns="columns"
         :rows="catalogs"
-        :line-numbers="true"
-        :row-style-class="rowStyleHidden"
+        :row-style-class="[rowStyleHidden, rowStyleClassFn]"
+
+        :fixed-header="true"
         v-on:row-click="onRowClick"
+        
         :pagination-options="{
           enabled: true,
           mode: 'records',
           perPage: 20,
           position: 'bottom',
           perPageDropdown: [20, 50, 100],
-          dropdownAllowAll: false,
+          dropdownAllowAll: true,
           setCurrentPage: 1,
           nextLabel: 'Вперёд',
           prevLabel: 'Назад',
@@ -26,8 +28,8 @@
           allLabel: 'All',
           infoFn: (params) => `Текущая страница ${params.firstRecordOnPage}`, 
         }"
-        compactMode>
-      </vue-good-table>
+        compactMode />
+
     </div>
   </div>
 </template>
@@ -50,19 +52,33 @@ export default {
       searchString: '',
       price: { from: 0, to: Infinity },
       columns: [
+
         {
           label: 'Имя',
           field: 'name',
+          filterOptions: {
+            enabled: true,
+          }
         },
         {
           label: 'Бренд',
           field: 'properties.brand.value',
+          filterOptions: {
+            enabled: true,
+          }
         },
         {
           label: 'Цена',
           field: 'prices.retailPriceUzs',
         },
-        
+        {
+          label: 'Photo',
+          field: 'vendorImage',
+          formatFn: this.formatImg,
+          filterOptions: {
+            enabled: true,
+          }
+        }
       ],
     }
   },
@@ -104,13 +120,22 @@ export default {
     },
     rowStyleHidden(row) {
       
-      // return row.prices.retailPriceUzs == 1 ? 'd-none' : '';
+      return row.prices.retailPriceUzs == 1 ? 'd-none' : '';
     },
     onRowClick(row) {
       console.log(row.row.id);
-      console.log(row.row.vendorImage + '.jpg');
+      console.log(row.row.vendorImage + '.jpeg');
 
-    }
+    },
+    formatImg(src) {
+      return `https://app.billz.uz/fileupload/products/${src}.jpeg`
+    },
+    rowStyleClassFn(row) {
+      return row.price > 10000 ? 'green' : 'red';
+    },
+  },
+  computed: {
+
   },
   mounted() {
     this.catalogGet();
@@ -119,19 +144,20 @@ export default {
 }
 </script>
 <style lang="css">
-  .main-content {
-    margin-top: 10%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 10%;
+.main-content {
+  margin-top: 10%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10%;
 
-  }
-  .main-content-center {
-    margin-top: 25%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+}
 
-  }
+.main-content-center {
+  margin-top: 25%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
 </style>
