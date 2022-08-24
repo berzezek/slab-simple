@@ -1,17 +1,13 @@
 <template lang="">
   <div class="container">
-    <div class="main-content-center" v-if="isLoading">
-        <MainLoader />
-    </div>
-    <div class="main-content" v-else>
+    <div class="main-content">
       <vue-good-table
+        compactMode
+        v-on:row-click="onRowClick"
+
         :columns="columns"
         :rows="catalogs"
-        :row-style-class="[rowStyleHidden, rowStyleClassFn]"
-
-        :fixed-header="true"
-        v-on:row-click="onRowClick"
-        
+        :row-style-class="rowStyleHidden"
         :pagination-options="{
           enabled: true,
           mode: 'records',
@@ -28,7 +24,25 @@
           allLabel: 'All',
           infoFn: (params) => `Текущая страница ${params.firstRecordOnPage}`, 
         }"
-        compactMode />
+        >
+        <template #emptystate class="d-flex justify-content-center">
+          <div class="main-content-center" v-if="isLoading">
+              <MainLoader />
+          </div>
+        
+        </template>
+        <template #table-row="props">
+          <span v-if="props.column.field == 'vendorImage'">
+            <span><img :src="formatImg(props.row.vendorImage)"/></span> 
+          </span>
+          <!-- <span v-else-if="props.column.label == 'Бренд'">
+            <span>{{ props.row.properties.brand.value || 'NoName' }}</span> 
+          </span> -->
+          <!-- <span v-else>
+            {{props.formattedRow[props.column.field]}}
+          </span> -->
+        </template>
+      </vue-good-table>
 
     </div>
   </div>
@@ -50,14 +64,22 @@ export default {
       perPage: 20,
       page: 1,
       searchString: '',
-      price: { from: 0, to: Infinity },
+      price: { from: 1, to: Infinity },
       columns: [
-
         {
-          label: 'Имя',
+          label: '',
+          field: 'vendorImage',
+          formatFn: this.formatImg,
+          sortable: false,
+
+
+        },
+        {
+          label: 'Наименование',
           field: 'name',
           filterOptions: {
             enabled: true,
+            placeholder: 'По наименованию'
           }
         },
         {
@@ -65,20 +87,15 @@ export default {
           field: 'properties.brand.value',
           filterOptions: {
             enabled: true,
+            placeholder: 'По бренду'
           }
         },
         {
           label: 'Цена',
           field: 'prices.retailPriceUzs',
+
         },
-        {
-          label: 'Photo',
-          field: 'vendorImage',
-          formatFn: this.formatImg,
-          filterOptions: {
-            enabled: true,
-          }
-        }
+
       ],
     }
   },
@@ -122,17 +139,15 @@ export default {
       
       return row.prices.retailPriceUzs == 1 ? 'd-none' : '';
     },
-    onRowClick(row) {
-      console.log(row.row.id);
-      console.log(row.row.vendorImage + '.jpeg');
-
-    },
     formatImg(src) {
       return `https://app.billz.uz/fileupload/products/${src}.jpeg`
     },
     rowStyleClassFn(row) {
       return row.price > 10000 ? 'green' : 'red';
     },
+    nullBrand(row) {
+      return row
+    }
   },
   computed: {
 
@@ -154,7 +169,8 @@ export default {
 }
 
 .main-content-center {
-  margin-top: 25%;
+  margin-top: 10%;
+  margin-bottom: 10%;
   display: flex;
   justify-content: center;
   align-items: center;
