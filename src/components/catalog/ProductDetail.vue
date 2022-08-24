@@ -5,7 +5,7 @@
     <br />
     <br />
     <br />
-    <div class="main-content mb-5" v-if="isLoading">
+    <div class="main-content my-5" v-if="isLoading">
       <div class="mt-5">
         <MainLoader class="mt-5" />
       </div>
@@ -29,7 +29,7 @@
               <p>Количество: {{ product.qty }} </p>
               <p>Размер: {{ product.size }} </p>
               <p>Артикул: {{ product.sku }} </p>
-              <button class="btn btn-success my-2" @click="$router.go(-1)">Назад</button>
+              <button class="btn btn-success my-2" @click="backAndScroll">Назад</button>
             </div>
           </div>
         </div>
@@ -55,6 +55,7 @@ export default {
   data() {
     return {
       isLoading: false,
+      id: '',
       product: {
         name: '',
         image: '',
@@ -74,7 +75,7 @@ export default {
         "method": "products.get",
         "params": {
           "LastUpdatedDate": "2018-03-21T18:19:25Z",
-          "WithProductPhotoOnly": 0,
+          "WithProductPhotoOnly": 1,
           "IncludeEmptyStocks": 0
         },
         "id": "4926796"
@@ -91,14 +92,15 @@ export default {
       };
       await axios(config).then((res) => {
         const results = res.data.result;
-        const product = results.filter(n => n.ID === 3031085)[0]
-        console.log(product)
+        this.id = this.$attrs.id;
+        const product = results.filter(n => n.ID == this.id)[0]
         this.product.name = product.name;
+        console.log(product.imageUrls)
         this.product.image = product.imageUrls[0].url;
         this.product.qty = product.qty;
         this.product.price = product.price;
-        this.product.brand = product.properties.BRAND;
-        this.product.size = product.properties.SIZE;
+        this.product.brand = product.properties ? product.properties.BRAND : '-';
+        this.product.size = product.properties ? product.properties.SIZE : '-';
         this.product.sku = product.sku;
       });
       this.isLoading = false;
@@ -108,6 +110,10 @@ export default {
     },
     formatPrice(prc) {
       return Math.floor(prc).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' UZS';
+    },
+    backAndScroll() {
+      this.$router.go(-1);
+      document.body.scrollTop = document.documentElement.scrollTop = 0;
     }
 
   },

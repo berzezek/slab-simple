@@ -14,7 +14,7 @@
         :pagination-options="{
           enabled: true,
           mode: 'records',
-          perPage: 20,
+          perPage: 10,
           position: 'bottom',
           perPageDropdown: [10, 20, 50, 100],
           dropdownAllowAll: false,
@@ -87,6 +87,11 @@ export default {
           },
         },
         {
+          label: "id",
+          field: "ID",
+
+        },
+        {
           label: "Бренд",
           field: "properties.BRAND",
 
@@ -149,6 +154,7 @@ export default {
         name: "product-detail",
         params: { id: params.row.ID },
       });
+      document.body.scrollTop = document.documentElement.scrollTop = 0;
     },
   },
   computed: {
