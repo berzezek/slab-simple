@@ -6,7 +6,7 @@
             <div class="d-flex justify-content-center">
                 <div class="text-center">
                     <h1 class="mx-auto my-0 text-uppercase">slabfmly</h1>
-                    <h2 class="text-white-50 mx-auto mt-2 mb-5">Магазин скейбордов и горнолыжного снаряжения в Узбекистане</h2>
+                    <h2 class="text-white-50 mx-auto mt-2 mb-5">Магазин скейтбордов и горнолыжного снаряжения в Узбекистане</h2>
                     <router-link to="/catalog"><a class="btn btn-primary" >Взглянуть на товар</a></router-link>
                 </div>
             </div>
@@ -47,7 +47,7 @@
                         <div class="d-flex h-100">
                             <div class="project-text w-100 my-auto text-center text-lg-left">
                                 <h4 class="text-white">Летом</h4>
-                                <p class="mb-0 text-white-50">Скейборды, лонгборды, круизеры, пластборды ну все к ним!</p>
+                                <p class="mb-0 text-white-50">Скейтборды, лонгборды, круизеры, пластборды ну все к ним!</p>
                                 <hr class="d-none d-lg-block mb-0 ms-0" />
                             </div>
                         </div>
@@ -62,7 +62,7 @@
                         <div class="d-flex h-100">
                             <div class="project-text w-100 my-auto text-center text-lg-right">
                                 <h4 class="text-white">Зимой</h4>
-                                <p class="mb-0 text-white-50">Горные лыжи, снобороды и все что нужно зимой в горах!</p>
+                                <p class="mb-0 text-white-50">Горные лыжи, сноубороды и все что нужно зимой в горах!</p>
                                 <hr class="d-none d-lg-block mb-0 me-0" />
                             </div>
                         </div>

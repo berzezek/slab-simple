@@ -9,15 +9,15 @@
         compactMode
         v-on:row-click="onRowClick"
         :columns="columns"
-        :rows="catalogs"
+        :rows="allCatalog"
         :row-style-class="rowStyleClassFn"
         :pagination-options="{
           enabled: true,
           mode: 'records',
           perPage: 20,
           position: 'bottom',
-          perPageDropdown: [10, 20, 50],
-          dropdownAllowAll: true,
+          perPageDropdown: [10, 20, 50, 100],
+          dropdownAllowAll: false,
           setCurrentPage: 1,
           nextLabel: 'Вперёд',
           prevLabel: 'Назад',
@@ -36,14 +36,12 @@
         </template>
         <template #table-row="props">
           <span v-if="props.column.field == 'imageUrls[0].url'">
-            <span><img :src="props.row.imageUrls[0].url"/></span> 
+            <span><img :src="props.row.imageUrls[0].url" /></span>
           </span>
-          <!-- <span v-else-if="props.column.field == 'qty'">
-            <span>{{}}</span> 
-          </span> -->
+
         </template>
         <template #table-actions-bottom >
-          <p class="my-2 text-center">А товаров всего:<h3>{{ catalogs.length }}</h3> ... на секудочку!!!</p>
+          <p class="my-2 text-center">А товаров всего:<h3>{{ allCatalog.length }}</h3> ... на секудочку!!!</p>
         </template>
       </vue-good-table>
 
@@ -51,141 +49,119 @@
   </div>
 </template>
 <script>
-import axios from 'axios';
-import { VueGoodTable } from 'vue-good-table-next';
-import MainLoader from '@/views/MainLoader.vue';
+import { mapGetters, mapActions } from "vuex";
+import axios from "axios";
+import { VueGoodTable } from "vue-good-table-next";
+import MainLoader from "@/views/MainLoader.vue";
 export default {
   components: {
     VueGoodTable,
-    MainLoader
+    MainLoader,
   },
 
   data() {
     return {
       isLoading: true,
-      catalogs: [],
-      perPage: 20,
-      page: 1,
-      searchString: '',
       columns: [
         {
-          label: '',
-          field: 'imageUrls[0].url',
-          formatFn: this.formatImg,
+          label: "",
+          field: "imageUrls[0].url",
+          // formatFn: this.formatImage,
           sortable: false,
-
-
         },
         {
-          label: 'Имя',
-          field: 'name',
+          label: "Имя",
+          field: "name",
           filterOptions: {
             enabled: true,
-            placeholder: 'По наименованию'
-          }
+            placeholder: "По наименованию",
+          },
         },
         {
-          label: 'Размер',
-          field: 'properties.SIZE',
-
-          filterOptions: {
-            enabled: true,
-            placeholder: 'По размеру'
-          }
-        },
-        {
-          label: 'Бренд',
-          field: 'properties.BRAND',
+          label: "Размер",
+          field: "properties.SIZE",
 
           filterOptions: {
             enabled: true,
-            placeholder: 'По бренду'
-          }
+            placeholder: "По размеру",
+          },
         },
         {
-          label: 'Цена',
+          label: "Бренд",
+          field: "properties.BRAND",
+
+          filterOptions: {
+            enabled: true,
+            placeholder: "По бренду",
+          },
+        },
+        {
+          label: "Цена",
           formatFn: this.formatPrice,
-          field: 'price',
-
+          field: "price",
         },
         {
-          label: 'Кол-во',
-          field: 'qty',
+          label: "Кол-во",
+          field: "qty",
           formatFn: this.formatQty,
           filterOptions: {
             enabled: true,
-            placeholder: 'По количеству'
-          }
+            placeholder: "По количеству",
+          },
         },
-
       ],
-    }
+    };
   },
   methods: {
-    async productGet() {
-      this.isLoading = true;
-      let data = JSON.stringify({
-        "jsonrpc": "2.0",
-        "method": "products.get",
-        "params": {
-          "LastUpdatedDate": "2018-03-21T18:19:25Z",
-          "WithProductPhotoOnly": 0,
-          "IncludeEmptyStocks": 0
-        },
-        "id": 1
-      });
-      let config = {
-        method: 'post',
-        url: 'https://api.billz.uz/v1/',
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIyMTMuMjMwLjEwMi4zNiIsImlhdCI6MTYzODU1MzY3NywiZXhwIjoxNzM4NTUzNjc3LCJzdWIiOiJzbGFiLmVjb21tZXJjZXNheXQifQ.Qq6OKJaM0GZ6j6Wiq_eIJFSYRuYBn08usQmacUzqb8s',
-          'Content-Type': 'application/json'
-        },
-        data: data
-      };
-      await axios(config).then((res) => {
-        let results = res.data.result;
-        this.catalogs = results.filter(results => results.price > 1);
-      });
-      this.isLoading = false;
-    },
+    ...mapActions({ getCatalog: "catalog/getCatalog" }),
     rowStyleClassFn(row) {
       // return row.qty > 3 ? 'text-uppercase' : 'text-warning';
     },
     formatPrice(prc) {
       const price = Math.floor(prc);
-      return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' UZS';
+      return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " UZS";
     },
     formatBrand(brd) {
       if (brd) {
-        return brd
+        return brd;
       } else {
-        return 'NoName'
+        return "NoName";
       }
     },
     formatQty(qty) {
       if (qty > 5) {
-        return 'Много'
+        return "Много";
       } else if (qty > 3) {
-        return 'Не много'
+        return "Не много";
       } else {
-        return 'Чуть-чуть'
+        return "Чуть-чуть";
       }
     },
+    // formatImage(src) {
+    //   if (src) {
+    //     return src
+    //   } else {
+    //     return ''
+    //   }
+    // },
     onRowClick(params) {
-      this.$router.push({ name: 'product-detail', params: { id: params.row.ID } })
-    }
+      this.$router.push({
+        name: "product-detail",
+        params: { id: params.row.ID },
+      });
+    },
   },
   computed: {
-
+    ...mapGetters({
+      allCatalog: "catalog/allCatalog",
+    }),
   },
-  mounted() {
-    // this.catalogGet();
-    this.productGet();
-  }
-
-}
+  async mounted() {
+    this.isLoading = true;
+    await this.getCatalog();
+    this.isLoading = false;
+  },
+};
 </script>
 <style lang="css">
 .main-content {
@@ -194,7 +170,6 @@ export default {
   justify-content: center;
   align-items: center;
   margin-bottom: 10%;
-
 }
 
 .main-content-center {
@@ -203,6 +178,5 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-
 }
 </style>
