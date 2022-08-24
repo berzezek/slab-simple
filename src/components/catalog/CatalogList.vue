@@ -1,27 +1,30 @@
 <template lang="">
   <div class="container">
+    <br/>
+    <br/>
+    <br/>
+    <br/>
     <div class="main-content">
       <vue-good-table
         compactMode
         v-on:row-click="onRowClick"
-
         :columns="columns"
         :rows="catalogs"
-        :row-style-class="rowStyleHidden"
+        :row-style-class="rowStyleClassFn"
         :pagination-options="{
           enabled: true,
           mode: 'records',
           perPage: 20,
           position: 'bottom',
-          perPageDropdown: [20, 50, 100],
+          perPageDropdown: [10, 20, 50],
           dropdownAllowAll: true,
           setCurrentPage: 1,
           nextLabel: 'Вперёд',
           prevLabel: 'Назад',
           rowsPerPageLabel: 'Записей на странице',
-          ofLabel: 'of',
+          ofLabel: 'из',
           pageLabel: 'page', // for 'pages' mode
-          allLabel: 'All',
+          allLabel: 'Показать всё',
           infoFn: (params) => `Текущая страница ${params.firstRecordOnPage}`, 
         }"
         >
@@ -32,22 +35,22 @@
         
         </template>
         <template #table-row="props">
-          <span v-if="props.column.field == 'vendorImage'">
-            <span><img :src="formatImg(props.row.vendorImage)"/></span> 
+          <span v-if="props.column.field == 'imageUrls[0].url'">
+            <span><img :src="props.row.imageUrls[0].url"/></span> 
           </span>
-          <!-- <span v-else-if="props.column.label == 'Бренд'">
-            <span>{{ props.row.properties.brand.value || 'NoName' }}</span> 
+          <!-- <span v-else-if="props.column.field == 'qty'">
+            <span>{{}}</span> 
           </span> -->
-          <!-- <span v-else>
-            {{props.formattedRow[props.column.field]}}
-          </span> -->
+        </template>
+        <template #table-actions-bottom >
+          <p class="my-2 text-center">А товаров всего:<h3>{{ catalogs.length }}</h3> ... на секудочку!!!</p>
         </template>
       </vue-good-table>
 
     </div>
   </div>
 </template>
-<script lang="">
+<script>
 import axios from 'axios';
 import { VueGoodTable } from 'vue-good-table-next';
 import MainLoader from '@/views/MainLoader.vue';
@@ -64,18 +67,17 @@ export default {
       perPage: 20,
       page: 1,
       searchString: '',
-      price: { from: 1, to: Infinity },
       columns: [
         {
           label: '',
-          field: 'vendorImage',
+          field: 'imageUrls[0].url',
           formatFn: this.formatImg,
           sortable: false,
 
 
         },
         {
-          label: 'Наименование',
+          label: 'Имя',
           field: 'name',
           filterOptions: {
             enabled: true,
@@ -83,8 +85,18 @@ export default {
           }
         },
         {
+          label: 'Размер',
+          field: 'properties.SIZE',
+
+          filterOptions: {
+            enabled: true,
+            placeholder: 'По размеру'
+          }
+        },
+        {
           label: 'Бренд',
-          field: 'properties.brand.value',
+          field: 'properties.BRAND',
+
           filterOptions: {
             enabled: true,
             placeholder: 'По бренду'
@@ -92,68 +104,85 @@ export default {
         },
         {
           label: 'Цена',
-          field: 'prices.retailPriceUzs',
+          formatFn: this.formatPrice,
+          field: 'price',
 
+        },
+        {
+          label: 'Кол-во',
+          field: 'qty',
+          formatFn: this.formatQty,
+          filterOptions: {
+            enabled: true,
+            placeholder: 'По количеству'
+          }
         },
 
       ],
     }
   },
   methods: {
-    async catalogGet() {
+    async productGet() {
       this.isLoading = true;
       let data = JSON.stringify({
         "jsonrpc": "2.0",
-        "method": "catalog.get",
+        "method": "products.get",
         "params": {
-          "PerPage": 10000,
-          "Page": 1,
-          "Price.From": 2,
-          "Sort": {
-            "type": "num",
-            "field": "id",
-            "order": "desc"
-          }
+          "LastUpdatedDate": "2018-03-21T18:19:25Z",
+          "WithProductPhotoOnly": 0,
+          "IncludeEmptyStocks": 0
         },
-        "id": "1200"
+        "id": 1
       });
       let config = {
         method: 'post',
-        url: 'https://api.billz.uz/v2/',
-        headers: { 
-          'Cache-Control': 'no-cache', 
-          'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIyMTMuMjMwLjEwMi4zNiIsImlhdCI6MTYzODU1MzY3NywiZXhwIjoxNzM4NTUzNjc3LCJzdWIiOiJzbGFiLmVjb21tZXJjZXNheXQifQ.Qq6OKJaM0GZ6j6Wiq_eIJFSYRuYBn08usQmacUzqb8s', 
+        url: 'https://api.billz.uz/v1/',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIyMTMuMjMwLjEwMi4zNiIsImlhdCI6MTYzODU1MzY3NywiZXhwIjoxNzM4NTUzNjc3LCJzdWIiOiJzbGFiLmVjb21tZXJjZXNheXQifQ.Qq6OKJaM0GZ6j6Wiq_eIJFSYRuYBn08usQmacUzqb8s',
           'Content-Type': 'application/json'
         },
-        data : data
+        data: data
       };
       await axios(config).then((res) => {
-        let results = res.data.result.data.results;
-        this.catalogs = results.filter(results => results.prices.retailPriceUzs > 1 );
-        this.catalogs = results;
-        console.log(this.catalogs);
+        let results = res.data.result;
+        this.catalogs = results.filter(results => results.price > 1);
       });
       this.isLoading = false;
     },
-    rowStyleHidden(row) {
-      
-      return row.prices.retailPriceUzs == 1 ? 'd-none' : '';
-    },
-    formatImg(src) {
-      return `https://app.billz.uz/fileupload/products/${src}.jpeg`
-    },
     rowStyleClassFn(row) {
-      return row.price > 10000 ? 'green' : 'red';
+      // return row.qty > 3 ? 'text-uppercase' : 'text-warning';
     },
-    nullBrand(row) {
-      return row
+    formatPrice(prc) {
+      const price = Math.floor(prc);
+      return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' UZS';
+    },
+    formatBrand(brd) {
+      if (brd) {
+        return brd
+      } else {
+        return 'NoName'
+      }
+    },
+    formatQty(qty) {
+      if (qty > 5) {
+        return 'Много'
+      } else if (qty > 3) {
+        return 'Не много'
+      } else {
+        return 'Чуть-чуть'
+      }
+    },
+    onRowClick(params) {
+      this.$router.push({ name: 'product-detail', params: { id: params.row.ID } })
     }
   },
   computed: {
 
   },
   mounted() {
-    this.catalogGet();
+    // this.catalogGet();
+    this.productGet();
   }
 
 }
