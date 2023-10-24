@@ -5,9 +5,10 @@
         <div class="container px-4 px-lg-5 d-flex h-100 align-items-center justify-content-center">
             <div class="d-flex justify-content-center">
                 <div class="text-center">
+
                     <h1 class="mx-auto my-0 text-uppercase">slabfmly</h1>
                     <h2 class="text-white-50 mx-auto mt-2 mb-5">Магазин скейтбордов и горнолыжного снаряжения в Узбекистане</h2>
-                    <router-link to="/catalog"><a class="btn btn-primary" >Взглянуть на товар</a></router-link>
+                    <!-- <router-link to="/catalog"><a class="btn btn-primary" >Взглянуть на товар</a></router-link> -->
                 </div>
             </div>
         </div>
@@ -69,6 +70,21 @@
                     </div>
                 </div>
             </div>
+            <!-- Project Third Row-->
+            <div class="row gx-0 mb-5 mb-lg-0 justify-content-center">
+                <div class="col-lg-6"><img class="img-fluid" src="@/assets/img/camping.webp" alt="skateboarding" /></div>
+                <div class="col-lg-6">
+                    <div class="bg-black text-center h-100 project">
+                        <div class="d-flex h-100">
+                            <div class="project-text w-100 my-auto text-center text-lg-left">
+                                <h4 class="text-white">Снаряжение в горы</h4>
+                                <p class="mb-0 text-white-50">Рюкзаки, палатки, трекинговые палочки и все что нужно для похода в горы!</p>
+                                <hr class="d-none d-lg-block mb-0 ms-0" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
     <!-- Signup-->
@@ -76,11 +92,11 @@
 
 </template>
 <script>
+import { KinesisContainer, KinesisElement } from 'vue-kinesis'
+
 
 export default {
-    
+
 }
 </script>
-<style src="@/css/styles.css">
-    
-</style>
+<style src="@/css/styles.css"></style>
